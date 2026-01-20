@@ -1,0 +1,83 @@
+SDA Day 1 — Docker 기초 정리
+📌 오늘 한 것 요약
+
+오늘은 Docker의 기본 개념을 이해하고, 실제로 첫 컨테이너를 실행해보는 것을 목표로 공부했다.
+Docker가 왜 필요한지, VM과 무엇이 다른지, 그리고 Docker의 핵심 구성요소가 무엇인지 정리했다.
+
+1️⃣ Docker는 왜 필요할까?
+
+개발하면서 가장 자주 겪는 문제가 “내 컴퓨터에서는 되는데 서버에서는 안 된다”
+라는 문제다. 이 문제의 원인은 대부분 실행 환경 차이다.OS 차이,라이브러리 버전 차이,설정 파일 차이
+
+Docker는 이 문제를 해결하기 위해
+애플리케이션과 실행 환경을 하나로 묶어서 배포할 수 있게 해준다.
+
+👉 즉, 환경을 통째로 표준화하는 도구다.
+
+2️⃣ 컨테이너(Container)란?
+
+컨테이너는 다음과 같이 이해했다.
+컨테이너 = 애플리케이션을 실행하기 위한 독립된 환경 단위
+OS 전체를 포함하지 않는다
+Host OS의 커널을 공유한다
+그래서 가볍고 빠르다
+이 점 때문에 Docker는 실행 속도가 빠르고 배포가 간단하다.
+  
+3️⃣ VM과 Docker의 차이
+  
+가장 중요한 차이점은 OS 포함 여부다.
+구분:	VM	vs Docker
+OS:	OS 전체 포함	 vs Host OS 공유
+무게:	무거움	vs 가벼움
+실행 속도:	느림 vs	빠름
+실무 사용:	감소 추세	vs 사실상 표준
+
+👉 Docker는 VM보다 훨씬 가볍고, 실무에 더 적합하다.
+
+4️⃣ Docker의 핵심 구성요소
+
+Docker는 크게 세 가지로 구성된다.
+Image:실행 환경의 설계도,애플리케이션 + 라이브러리 + 설정 정보 포함
+예: hello-world, mysql:8.0
+Container:Image를 실행한 결과물,실제로 돌아가는 프로세스
+Registry:Image를 저장하는 공간
+대표적으로 Docker Hub 사용
+  
+5️⃣ docker run hello-world 실습
+  
+Docker가 제대로 설치되었는지 확인하기 위해 hello-world 컨테이너를 실행했다.
+docker run hello-world
+실행 결과
+Docker Hub에서 hello-world 이미지를 자동으로 다운로드,해당 이미지로 컨테이너 생성,컨테이너 실행 후 메시지 출력 후 정상 종료
+출력 메시지를 통해 다음을 확인할 수 있었다.
+👉 Docker 설치 및 기본 동작 확인 완료
+  
+6️⃣ docker run 명령어의 의미
+  
+docker run hello-world
+이 한 줄은 내부적으로 다음을 수행한다.
+로컬에 이미지가 있는지 확인 없으면 Registry(Docker Hub)에서 pull
+이미지로 컨테이너 생성 
+컨테이너 실행
+👉 run = pull + create + start
+  
+7️⃣ 기본 Docker 명령어 정리
+  
+docker images      # 로컬 이미지 목록
+docker ps          # 실행 중인 컨테이너
+docker ps -a       # 전체 컨테이너
+docker rm ID       # 컨테이너 삭제
+docker rmi ID      # 이미지 삭제
+
+8️⃣ 오늘 배운 핵심 포인트
+  
+Docker는 환경 문제를 해결하기 위한 도구
+컨테이너는 VM이 아니다
+Image는 설계도, Container는 실행 결과
+docker run은 Docker 사용의 시작점
+
+✅ 오늘 학습 체크리스트
+
+Docker 개념 이해
+VM과 Docker 차이 설명 가능
+Image / Container 구분 가능
