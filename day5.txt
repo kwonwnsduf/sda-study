@@ -1,0 +1,103 @@
+# APP+DB(MySQL) 연동& Volume 이해
+## Docker Network 왜 필요한가
+localhost로 연결하면 되지 않나?
+->컨테이너 안에서 localhost는 자기 자신
+### Docker Compose의 기본 네트워크
+> services:
+  app:
+  db:
+이렇게 쓰면 Docker가 자동으로:
+
+하나의 가상 네트워크 생성
+
+서비스 이름을 호스트 이름(DNS) 으로 등록
+
+즉,
+> app 컨테이너 → db 컨테이너 접속 주소
+jdbc:mysql://db:3306/mydb
+
+db = 서비스 이름 = 네트워크 주소
+
+## Volume (DB 데이터는 왜 날아가면 안 되나?)
+컨테이너만 쓰면 생기는 문제
+> docker compose down
+
+MySql 컨테이너 삭제
+
+데이터 전부 삭제
+
+### Volume의 개념
+컨테이너 밖에 데이터를 저장하는 공간
+
+컨테이너 = 실행
+볼륨 = 데이터
+
+
+컨테이너가 죽어도:
+
+Volume은 살아있음
+
+다시 실행하면 데이터 그대로
+
+## 실전 docker-compose.yml
+> version: "3.8"
+
+	services:
+  	db:
+    image: mysql:8.0
+    container_name: sda-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sda_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - sda-mysql-data:/var/lib/mysql
+
+ 	 app:
+    image: openjdk:17-jdk
+    container_name: sda-app
+    depends_on:
+      - db
+    command: ["sleep", "9999"]
+
+	volumes:
+ 	 sda-mysql-data:
+
+## 이 파일을 한 줄씩 쉽게 설명하면
+
+### db서비스
+> image: mysql:8.0
+
+MySql8 컨테이너 사용
+
+> environment:
+  MYSQL_ROOT_PASSWORD: root
+  MYSQL_DATABASE: sda_db
+
+MySQL 초기 설정
+
+> volumes:
+	 - sda-mysql-data:/var/lib/mysql
+     
+ DB 데이터 영구 저장/sda-mysql-data는 docker가 관리하는 volume 이름
+ 
+ /var/lib/mysql은 MYSQL이 실제 데이터를 저장하는 디렉토리
+ 
+###  app 서비스
+> depends_on:
+  	- db
+    
+   DB먼저 실행
+   
+>  command: ["sleep", "9999"]
+
+지금은 테스트용 → 컨테이너 유지용
+
+## 명령어
+
+> docker compose up -d
+
+> docker ps
+
+> docker volume ls
