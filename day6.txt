@@ -1,0 +1,85 @@
+App <-> DB 컨테이너 연결
+왜 localhost 쓰면 안 되나?
+spring:
+datasource:
+url: jdbc:mysql://localhost:3306/sda
+
+컨테이너 안에서 localhost는 자기 자신
+MySQL 컨테이너를 절대 못 찾음
+
+정답:
+
+jdbc:mysql://sda-mysql:3306/sda
+
+sda-mysql = docker-compose 서비스 이름
+Docker 네트워크의 DNS 이름
+
+application 설정 분리 (로컬 vs 도커)
+src/main/resources/
+├ application-local.yml ← IntelliJ에서 실행
+└ application-docker.yml ← 컨테이너에서 실행
+
+application-local.yml
+spring:
+datasource:
+url: jdbc:mysql://localhost:3306/sda
+username: root
+password: 1234
+
+application-docker.yml
+spring:
+datasource:
+url: jdbc:mysql://DB 
+H
+​
+ OST:3306/{DB_NAME}
+username: ${DB_USER}
+password: ${DB_PASSWORD}
+
+Dockerfile
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY build/libs/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+docker-compose.yml
+version: "3.8"
+services:
+sda-mysql:
+image: mysql:8.0
+container_name: sda-mysql
+environment:
+MYSQL_ROOT_PASSWORD: 1234
+MYSQL_DATABASE: sda
+ports:
+- "3306:3306"
+volumes:
+- sda-mysql-data:/var/lib/mysql
+sda-app:
+build: .
+container_name: sda-app
+depends_on:
+- sda-mysql
+environment:
+SPRING_PROFILES_ACTIVE: docker
+DB_HOST: sda-mysql
+DB_NAME: sda
+DB_USER: root
+DB_PASSWORD: 1234
+ports:
+- "8080:8080"
+volumes:
+sda-mysql-data:
+
+실행흐름
+docker compose up --build
+
+MySQL 컨테이너 실행
+
+Docker 네트워크 생성
+
+Spring Boot 컨테이너 실행
+
+앱이 sda-mysql:3306 으로 접속
+
+완전한 서비스 구조 완성
