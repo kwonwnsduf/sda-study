@@ -1,0 +1,50 @@
+내 로컬에서만 돌던 Docker 기반 앱을 AWS서버(EC2)에서 실제로 실행해본다!
+[내 노트북] ──(접속)──> [AWS EC2 (리눅스 서버)]
+                              ├─ Docker
+                              ├─ MySQL 컨테이너
+                              └─ Spring Boot 컨테이너
+                              
+## AWS EC2
+EC2 = 빌려 쓰는 리눅스 컴퓨터
+
+AWS가 제공하는 가상 서버
+
+24시간 켜져 있음
+
+IP 주소가 있음 → 외부에서 접속 가능
+
+EC2 = 항상 켜져 있는 리눅스 PC를 인터넷에 연결해 둔 것
+
+## 실습흐름
+
+### EC2 생성
+OS: Amazon Linux
+
+인스턴스 타입: t2.micro
+
+Key Pair 생성 (pem 다운로드)
+
+Security Group 설정 (22, 8080)
+
+### EC2 접속 (SSH)
+
+> chmod 400 mykey.pem
+ssh -i mykey.pem ec2-user@<퍼블릭IP>
+
+### 서버에 Docker 설치
+> sudo yum update -y
+sudo yum install docker -y
+sudo service docker start
+sudo usermod -aG docker ec2-user
+
+### docker-compose 설치
+> sudo curl -L \
+"https://github.com/docker/compose/releases/download/v2.25.0/docker-compose-linux-x86_64" \
+-o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+### 코드 옮기기
+> git clone https://github.com/repo
+
+### docker compose up
+> docker compose up -d
